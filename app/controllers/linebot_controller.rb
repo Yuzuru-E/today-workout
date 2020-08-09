@@ -24,16 +24,53 @@ class LinebotController < ApplicationController
           when Line::Bot::Event::MessageType::Text
             # event.message['text']：ユーザーから送られたメッセージ
             input = event.message['text']
-            url  = "https://www.drk7.jp/weather/xml/13.xml"
-            xml  = open( url ).read.toutf8
-            doc = REXML::Document.new(xml)
-            xpath = 'weatherforecast/pref/area[4]/'
-            # 当日朝のメッセージの送信の下限値は20％としているが、明日・明後日雨が降るかどうかの下限値は30％としている
-            min_per = 30
+            line_id = event['source']['userId']
+            # ①筋トレを行う曜日の指定
+            # 曜日が含まれている場合の処理
             case input
-              # 「明日」or「あした」というワードが含まれる場合
-            when /.*(明日|あした).*/
-              # info[2]：明日の天気
+              user = User.find(line_id: line_id)
+              if input.include?("月"||"火"||"水"||"木"||"金"||"土"||"日") && input.include?(" ")
+                schedules = input.split(' ')
+                schedules.each do |schedule|
+                  case schedule
+                  when "月"
+                    user.update(:monday) = 1
+                  when "火"
+                    # user = User.find(line_id: line_id)
+                    user.update(:tuesday) = 1
+                  when "水"
+                    # user = User.find(line_id: line_id)
+                    user.update(:wednsday) = 1
+                  when "木"
+                    # user = User.find(line_id: line_id)
+                    user.update(:thursday) = 1
+                  when "金"
+                    # user = User.find(line_id: line_id)
+                    user.update(:friday) = 1
+                  when "土"
+                    # user = User.find(line_id: line_id)
+                    user.update(:saturday) = 1
+                  when "日"
+                    # user = User.find(line_id: line_id)
+                    user.update(:sunday) = 1
+                  end
+                end
+                  push = 
+                    "筋トレを行う曜日は#{input}だなッッ\n続けて筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
+              else
+                push =
+                  "まずは曜日と半角スペースだけ入力して送信してくれッッ\nそれ以外は一向にわからんッッ"
+              end
+
+            when input.include?(0..23)
+                # user = User.find(line_id: line_id)
+                user.update(:workoutTime) = input.to_i
+                push =
+                  "筋トレを行う時間は#{input}だなッッ\n了解したッッ"
+
+
+            when /.*(月|月曜日).*/
+              # 
               per06to12 = doc.elements[xpath + 'info[2]/rainfallchance/period[2]'].text
               per12to18 = doc.elements[xpath + 'info[2]/rainfallchance/period[3]'].text
               per18to24 = doc.elements[xpath + 'info[2]/rainfallchance/period[4]'].text
