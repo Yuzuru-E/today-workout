@@ -17,6 +17,14 @@ ActiveRecord::Schema.define(version: 2020_06_23_081503) do
 
   create_table "users", force: :cascade do |t|
     t.string "line_id", null: false
+    t.boolean "sunday"
+    t.boolean "monday"
+    t.boolean "tuesday"
+    t.boolean "wednesday"
+    t.boolean "thursday"
+    t.boolean "friday"
+    t.boolean "saturday"
+    t.integer "workoutTime"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
