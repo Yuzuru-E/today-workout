@@ -29,43 +29,48 @@ class LinebotController < ApplicationController
             # 曜日が含まれている場合の処理
             case input
               user = User.find_by(line_id: line_id)
-            when input.include?("月"||"火"||"水"||"木"||"金"||"土"||"日") && input.include?(" ")
-                @schedules = input.split(' ')
-                @schedules.each do |schedule|
-                  case schedule
-                  when "月"
-                    user.update(:monday) = 1
-                  when "火"
-                    user.update(:tuesday) = 1
-                  when "水"
-                    user.update(:wednsday) = 1
-                  when "木"
-                    user.update(:thursday) = 1
-                  when "金"
-                    user.update(:friday) = 1
-                  when "土"
-                    user.update(:saturday) = 1
-                  when "日"
-                    user.update(:sunday) = 1
-                  end
-                end
+            # when input.include?("月"||"火"||"水"||"木"||"金"||"土"||"日") && input.include?(" ")
+            #     @schedules = input.split(' ')
+            #     @schedules.each do |schedule|
+            #       case schedule
+            when "月"
+              user.update(monday: 1)
+              push = 
+              "筋トレを行う曜日は#{input}だなッッ\n他の曜日にも筋トレする場合は改めて曜日を入力してくれッッ\n一通り曜日の入力が終わったら、筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
+            when "火"
+              user.update(tuesday: 1)
+              push = 
+              "筋トレを行う曜日は#{input}だなッッ\n他の曜日にも筋トレする場合は改めて曜日を入力してくれッッ\n曜日の入力が終わったら、筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
+            when "水"
+              user.update(wednsday: 1)
+              push = 
+              "筋トレを行う曜日は#{input}だなッッ\n他の曜日にも筋トレする場合は改めて曜日を入力してくれッッ\n曜日の入力が終わったら、筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
+            when "木"
+              user.update(thursday: 1)
+              push = 
+              "筋トレを行う曜日は#{input}だなッッ\n他の曜日にも筋トレする場合は改めて曜日を入力してくれッッ\n曜日の入力が終わったら、筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
+            when "金"
+              user.update(friday: 1)
+              push = 
+              "筋トレを行う曜日は#{input}だなッッ\n他の曜日にも筋トレする場合は改めて曜日を入力してくれッッ\n曜日の入力が終わったら、筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
+            when "土"
+              user.update(saturday: 1)
+              push = 
+              "筋トレを行う曜日は#{input}だなッッ\n他の曜日にも筋トレする場合は改めて曜日を入力してくれッッ\n曜日の入力が終わったら、筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
+            when "日"
+              user.update(sunday: 1)
+              push = 
+              "筋トレを行う曜日は#{input}だなッッ\n他の曜日にも筋トレする場合は改めて曜日を入力してくれッッ\n曜日の入力が終わったら、筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
+                # end
                   push = 
-                    "筋トレを行う曜日は#{input}だなッッ\n続けて筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
-              else
+                    "筋トレを行う曜日は#{input}だなッッ\n他の曜日にも筋トレする場合は改めて曜日を入力してくれッッ\n曜日の入力が終わったら、筋トレを行う時間を1時間単位で入力してくれッッ\n入力例:18\n0~23の範囲で入力してくれッッ"
+            when 0..23
+                user.update(workoutTime: input)
                 push =
-                  "まずは曜日と半角スペースだけ入力して送信してくれッッ\nそれ以外は一向にわからんッッ"
-              end
-              # ②筋トレを行う開始時刻設定
-            when input.include?(0..23)
-                @workoutTime = input
-                user.update(:workoutTime) = @workoutTime
-                push =
-                  "筋トレを行う時間は#{@workoutTime}だなッッ\n了解したッッ"
-              if (user[:monday] == 1 ||user[:tuesday] == 1 ||user[:wednsday] == 1 ||user[:thursday] == 1 ||user[:friday] == 1 ||user[:saturday] == 1 ||user[:sunday] == 1) && user[:workoutTime].present?
-                push =
-                  "筋トレを行う曜日は#{@schedules}で#{@workoutTimme}時からやるんだなッッ\nではその時間になり次第連絡するぞッッ"
-              end
-            # when /.*(月|月曜日).*/
+                  "筋トレを行う時間は#{input}だなッッ\n了解したッッ\n指定した曜日の時間になり次第連絡するぞッッ\n改めて設定をする場合は「再設定」とメッセージを送ってくれッッ"
+            when /.*(再設定).*/
+              user.reset(0)
+              user.update(workoutTime: nil)
             #   # 
             #   per06to12 = doc.elements[xpath + 'info[2]/rainfallchance/period[2]'].text
             #   per12to18 = doc.elements[xpath + 'info[2]/rainfallchance/period[3]'].text
